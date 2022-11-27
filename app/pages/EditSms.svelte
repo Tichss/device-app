@@ -1,12 +1,9 @@
 <script lang="ts">
-    import { navigate } from "svelte-native";
-    import Home from "./Home.svelte";
     import { devices } from "../store";
     import { setString } from "@nativescript/core/application-settings";
     import { goBack } from "svelte-native";
     import type { Device } from "~/components/Device.svelte";
     import { confirm } from "@nativescript/core/ui/dialogs";
-    import Sms from "~/components/Sms.svelte";
 
     export let device: Device = { name: "", phone: "", smses: [] };
     export let isNew = false;
@@ -37,9 +34,8 @@
     }
 
     function onAddSms() {
-        device.smses.push({ name: "Test1", text: "test1" });
-        device.smses = device.smses;
-        console.log("LEFUTOTT");
+        device.smses.push("");
+        device = device;
     }
 </script>
 
@@ -60,17 +56,12 @@
             <textField bind:text={device.name} />
             <label text="Eszköz száma*" />
             <textField bind:text={device.phone} keyboardType="number" />
-            <label text="Eszköz sms listája" />
             {#if device.smses?.length > 0}
-                {#each device.smses as sms}
-                    <Sms {sms} />
-                {/each}
-            {/if}
-            <!-- {#if device.smses?.length > 0}
+                <label text="Eszköz sms listája" />
                 {#each device.smses as sms}
                     <textField bind:text={sms} />
                 {/each}
-            {/if} -->
+            {/if}
             <button text="Sms hozzáadása" on:tap={onAddSms} />
             <button text="Mentés" on:tap={onSave} />
             {#if !isNew}

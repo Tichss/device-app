@@ -1,15 +1,16 @@
 <script context="module" lang="ts">
+    import type { Sms } from "~/components/Sms.svelte";
+
     export type Device = {
         name: string;
         phone: string;
-        smses: Array<string>;
+        smses: Array<Sms>;
     };
 </script>
 
 <script lang="ts">
     import { navigate } from "svelte-native";
     import EditDevice from "../pages/EditDevice.svelte";
-    import { goBack } from "svelte-native";
     import { dial } from "nativescript-phone";
 
     export let device: Device;
@@ -28,7 +29,6 @@
     function onCall() {
         /* setTimeout(() => {
             if (stop) {
-                console.log("onCall");
                 dial(device.phone, false);
             }
         }, 100);

@@ -9,6 +9,8 @@
 
     onMount(() => {
         $devices = JSON.parse(appSettings.getString("devices", "[]"));
+        console.log($devices);
+
         requestPermission(
             android.Manifest.permission.CALL_PHONE,
             "I need these permissions because I'm cool"
@@ -39,12 +41,14 @@
         />
     </actionBar>
 
-    <wrapLayout>
-        <button text="add" on:tap={onNewDevice} />
-        {#each $devices as device, i}
-            <Device {device} {i} />
-        {/each}
-    </wrapLayout>
+    <scrollView>
+        <wrapLayout>
+            <button text="add" on:tap={onNewDevice} />
+            {#each $devices as device, i}
+                <Device {device} {i} />
+            {/each}
+        </wrapLayout>
+    </scrollView>
 </page>
 
 <style lang="scss">
