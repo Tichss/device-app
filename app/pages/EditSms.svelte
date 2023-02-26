@@ -1,46 +1,42 @@
 <script lang="ts">
-    import { devices } from "../store";
+    import type { Device } from "~/components/Device.svelte";
+    import type { Sms } from "~/components/Sms.svelte";
     import { setString } from "@nativescript/core/application-settings";
     import { goBack } from "svelte-native";
-    import type { Device } from "~/components/Device.svelte";
-    import { confirm } from "@nativescript/core/ui/dialogs";
+    import { createEventDispatcher, onMount } from "svelte";
+    import { devices } from "~/store";
+    export let parentDevice: Device;
+    export let sms: Sms;
+    export let isNew: boolean;
 
-    export let device: Device = { name: "", phone: "", smses: [] };
-    export let isNew = false;
+    const dispatch = createEventDispatcher();
 
-    function onSave() {
-        if (isNew) {
-            $devices.push(device);
-            $devices = $devices;
-            setString("devices", JSON.stringify($devices));
-        }
-        goBack();
-    }
+    onMount(() => {
+        console.log("asd");
+    });
 
     function onDelete() {
-        confirm({
-            title: "Törlés",
-            message: `Törlöd az ezközt: ${device.name}?`,
-            okButtonText: "Törlés",
-            cancelButtonText: "Mégse",
-        }).then((res) => {
-            console.log(res);
-            if (res) {
-                $devices = $devices.filter((dev) => dev.name !== device.name);
-                setString("devices", JSON.stringify($devices));
-                goBack();
-            }
-        });
+        console.log("onDelete");
     }
-
-    function onAddSms() {
-        device.smses.push("");
-        device = device;
+    function onSave() {
+        if(isNew) {
+            parentDevice.smses.push(sms);
+            parentDevice = parentDevice;
+            setString("devices", JSON.stringify($devices));
+            
+        } else {
+            let i = parentDevice.smses.findIndex(smsTemp => {smsTemp.name == sms?.name;})
+            parentDevice.smses[i] = sms;
+            console.log('on:save modified sms');
+        }
+        $devices = $devices;
+        dispatch('save', parentDevice);
+        goBack();
     }
 </script>
 
 <page>
-    <actionBar title={isNew ? "Új eszköz" : `Eszköz: ${device.name}`}>
+    <actionBar title={`Eszköz: ${parentDevice.name} - Új sms`}>
         {#if !isNew}
             <actionItem
                 ios.systemIcon="16"
@@ -52,25 +48,38 @@
     </actionBar>
     <scrollView>
         <stackLayout>
-            <label text="Eszközneve*" />
-            <textField bind:text={device.name} />
-            <label text="Eszköz száma*" />
-            <textField bind:text={device.phone} keyboardType="number" />
-            {#if device.smses?.length > 0}
-                <label text="Eszköz sms listája" />
-                {#each device.smses as sms}
-                    <textField bind:text={sms} />
-                {/each}
-            {/if}
-            <button text="Sms hozzáadása" on:tap={onAddSms} />
+            <label text="Sms neve*" />
+            <textField bind:text={sms.name} />
+            <label text="Sms tartalma*" />
+            <textView bind:text={sms.text} />
             <button text="Mentés" on:tap={onSave} />
-            {#if !isNew}
-                <button text="Törlés" on:tap={onDelete} />
-            {/if}
+            <button text="Törlés" on:tap={onDelete} />
         </stackLayout>
     </scrollView>
 </page>
 
 <style lang="scss">
-    /* your styles go here */
+    stackLayout {
+        padding: 30px;
+
+        label {
+            font-size: 16px;
+            color: gray;
+        }
+
+        textField,
+        textView {
+            font-size: 18px;
+            margin: 0;
+        }
+        textView {
+            border-width: 1;
+            border-color: gray;
+            border-radius: 5;
+        }
+
+        button {
+            margin: 0;
+        }
+    }
 </style>

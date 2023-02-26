@@ -27,34 +27,56 @@
     }
 
     function onCall() {
-        /* setTimeout(() => {
+        console.log("onCall");
+
+        setTimeout(() => {
             if (stop) {
-                dial(device.phone, false);
+                /* dial(device.phone, false); */
             }
         }, 100);
-        stop = true; */
+        stop = true;
     }
 </script>
 
-<flexboxLayout on:tap={onCall}>
-    <label text={device.name} />
-    <button text="Edit Device" on:tap={onEdit} />
-</flexboxLayout>
+<absoluteLayout width="100%" height="100%">
+    <image src="~/images/test.png" on:tap={onEdit} />
+    <flexboxLayout>
+        <image src="~/images/device.png" on:tap={onCall} />
+        <label class="name" text={device.name} />
+        <label class="phone" text={device.phone} />
+    </flexboxLayout>
+</absoluteLayout>
 
 <style lang="scss">
-    button {
-        margin: 0;
-    }
+    absoluteLayout {
+        height: 100%;
+        width: 100%;
 
-    flexboxLayout {
-        margin: 5;
-        width: 90;
-        height: 90;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        background-color: #3c495e;
-        border-radius: 15;
+        image {
+            left: 5;
+            top: 5;
+        }
+
+        flexboxLayout {
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: black;
+
+            .name {
+                margin-bottom: -6;
+            }
+
+            .phone {
+                color: gray;
+                font-size: 10;
+            }
+
+            image {
+                height: 40;
+            }
+        }
     }
 </style>

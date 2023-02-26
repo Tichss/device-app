@@ -1,22 +1,25 @@
 <script lang="ts">
     import { navigate } from "svelte-native";
-    import Home from "./Home.svelte";
     import { devices } from "../store";
     import { setString } from "@nativescript/core/application-settings";
     import { goBack } from "svelte-native";
     import type { Device } from "~/components/Device.svelte";
     import { confirm } from "@nativescript/core/ui/dialogs";
     import Sms from "~/components/Sms.svelte";
-
+    import EditSms from "../pages/EditSms.svelte";
+    
     export let device: Device = { name: "", phone: "", smses: [] };
     export let isNew = false;
+
+    $: device, console.log('device', device);
+    
 
     function onSave() {
         if (isNew) {
             $devices.push(device);
-            $devices = $devices;
             setString("devices", JSON.stringify($devices));
         }
+        $devices = $devices;
         goBack();
     }
 
@@ -27,7 +30,6 @@
             okButtonText: "Törlés",
             cancelButtonText: "Mégse",
         }).then((res) => {
-            console.log(res);
             if (res) {
                 $devices = $devices.filter((dev) => dev.name !== device.name);
                 setString("devices", JSON.stringify($devices));
@@ -37,9 +39,10 @@
     }
 
     function onAddSms() {
-        device.smses.push({ name: "Test1", text: "test1" });
-        device.smses = device.smses;
-        console.log("LEFUTOTT");
+        navigate({
+            page: EditSms,
+            props: { parentDevice: device, sms: { name: "", text: "" }, isNew: true },
+        });
     }
 </script>
 
@@ -51,6 +54,7 @@
                 ios.position="right"
                 text="Törlés"
                 android.position="popup"
+                on:tap={onDelete}
             />
         {/if}
     </actionBar>
@@ -60,19 +64,20 @@
             <textField bind:text={device.name} />
             <label text="Eszköz száma*" />
             <textField bind:text={device.phone} keyboardType="number" />
-            <label text="Eszköz sms listája" />
-            {#if device.smses?.length > 0}
+            <label class="sms-label" text="Eszköz sms listája" />
+            <label text={device.smses.length.toString()} />
+            <stackLayout>
                 {#each device.smses as sms}
-                    <Sms {sms} />
+                    <label text="t1" />
+                    <Sms {sms} parent={device} />
                 {/each}
-            {/if}
-            <!-- {#if device.smses?.length > 0}
-                {#each device.smses as sms}
-                    <textField bind:text={sms} />
-                {/each}
-            {/if} -->
+            </stackLayout>
             <button text="Sms hozzáadása" on:tap={onAddSms} />
-            <button text="Mentés" on:tap={onSave} />
+            <button
+                text="Mentés"
+                on:tap={onSave}
+                isEnabled={!!device.name && !!device.phone}
+            />
             {#if !isNew}
                 <button text="Törlés" on:tap={onDelete} />
             {/if}
@@ -80,6 +85,22 @@
     </scrollView>
 </page>
 
-<style lang="scss">
-    /* your styles go here */
+<style lang="scss" scoped>
+    stackLayout {
+        padding: 30px;
+
+        label {
+            font-size: 16px;
+            color: gray;
+        }
+
+        textField {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .sms-label {
+            margin-top: 50px;
+        }
+    }
 </style>
